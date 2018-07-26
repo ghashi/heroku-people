@@ -9,10 +9,11 @@ var people = require('./lib/people');
 var _apps = []
 var _people = {};
 
+const paralelRequestLimit = 5;
 
 listapps(function(apps) {
 
-  async.each(apps, function(app, callback){
+  async.eachLimit(apps, paralelRequestLimit, function(app, callback){
     people.list(app, function(collaborators) {
       _apps.push({
         app: app,
@@ -27,6 +28,6 @@ listapps(function(apps) {
       callback();
     });
   }, function(err) {
-    _.forOwn(_people, function(apps, person) { console.log(person + ': ' + apps.join(',')); });
+    _.forOwn(_people, function(apps, person) { console.log('\n' + person + ': ' + apps.join(',')); });
   });
 })

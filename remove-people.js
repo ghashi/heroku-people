@@ -10,6 +10,7 @@ var person;
 var app_match = /.*/;
 // http://stackoverflow.com/a/5767589/429521
 var args = process.argv.slice(2);
+const paralelRequestLimit = 5;
 
 if (args && args.length > 1) {
   app_match = new RegExp(args[1]);
@@ -23,12 +24,12 @@ if (args && args.length > 0) {
 
 listapps(function(apps) {
   var apps_filtered = _.filter(apps, function(app) { return app_match.test(app); });
-  async.each(apps_filtered, function(app, callback){
+  async.eachLimit(apps_filtered, paralelRequestLimit, function(app, callback){
     people.remove(app, person, function(removed) {
-      console.log("executed removal from app: " + app);
+      console.log("executed removal from app " + app + '? ' + removed);
       callback();
     });
   }, function(err) {
-    console.log("");
+    console.log("error:", err);
   });
 })
